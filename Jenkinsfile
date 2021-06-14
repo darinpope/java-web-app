@@ -10,7 +10,7 @@ pipeline {
   stages {
     stage('Unlock keychain') {
       steps {
-        sh 'security -v unlock-keychain ~/Library/Keychains/login.keychain-db'
+        sh 'security -v unlock-keychain -u ~/Library/Keychains/login.keychain-db'
       }
     }
     stage('Build') {
