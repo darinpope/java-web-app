@@ -1,0 +1,8 @@
+x-aws-vpc: "vpc-0dece3d7dce2d0578"
+services:
+  web:
+    image: darinpope/java-web-app:latest
+    build:
+      context: .
+    ports:
+      - "8080:8080"

@@ -1,6 +1,9 @@
 FROM adoptopenjdk/openjdk11:alpine-slim as build
 WORKDIR /workspace/app
 
+ARG PORT
+ENV PORT ${PORT}
+
 COPY mvnw .
 COPY .mvn .mvn
 COPY pom.xml .
@@ -15,4 +18,4 @@ ARG DEPENDENCY=/workspace/app/target/dependency
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-Dserver.port=${PORT}","-cp","app:app/lib/*","com.example.demo.DemoApplication"]
+ENTRYPOINT ["java","-cp","app:app/lib/*","com.example.demo.DemoApplication"]
