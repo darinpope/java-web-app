@@ -6,11 +6,12 @@ pipeline {
   environment {
     DOCKER_HUB_CREDS = credentials('darinpope-docker-hub')
     AWS_CREDS = credentials('darinpope-aws-creds')
+    KEYCHAIN_PASSWORD = credentials('darinpope-keychain')
   }
   stages {
     stage('Unlock keychain') {
       steps {
-        sh 'security -v unlock-keychain -u ~/Library/Keychains/login.keychain-db'
+        sh 'security -v unlock-keychain -p $KEYCHAIN_PASSWORD ~/Library/Keychains/login.keychain-db'
       }
     }
     stage('Build') {
