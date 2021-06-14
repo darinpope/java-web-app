@@ -5,17 +5,13 @@ pipeline {
   }
   environment {
     DOCKER_HUB_CREDS = credentials('darinpope-docker-hub')
+    AWS_CREDS = credentials('darinpope-aws-creds')
   }
   stages {
-    stage('Login') {
+    stage('Select context') {
       steps {
-        sh 'echo $DOCKER_HUB_CREDS_PSW | docker login --username=$DOCKER_HUB_CREDS_USR --password-stdin'
+        sh 'docker context use darinpope-ecs-context'
       }
-    }
-  }
-  post {
-    always {
-      sh 'docker logout'
     }
   }
 }
