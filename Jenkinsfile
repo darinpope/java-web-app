@@ -8,6 +8,11 @@ pipeline {
     AWS_CREDS = credentials('darinpope-aws-creds')
   }
   stages {
+    stage('Unlock keychain') {
+      steps {
+        sh 'security -v unlock-keychain ~/Library/Keychains/login.keychain-db'
+      }
+    }
     stage('Build') {
       steps {
         sh 'docker context use default'
@@ -21,6 +26,11 @@ pipeline {
         sh 'docker compose up'
         sh 'docker compose ps --format json'
       }
+    }
+  }
+  post {
+    always {
+        sh 'security -v lock-keychain ~/Library/Keychains/login.keychain-db'
     }
   }
 }
