@@ -26,11 +26,11 @@ pipeline {
       steps {
         script {
           def dpTest = sh(returnStdout:true, script:'copilot app ls | { grep dp-test || true; }')
-          echo 'dpTest = ' + dpTest
+          echo 'dpTest = ' + String.valueOf(dpTest)
           if('dp-test'.equals(dpTest)) {
             applicationExists = true
           }
-          echo applicationExists
+          echo 'applicationExists = ' + String.valueOf(applicationExists)
         }
       }
     }
