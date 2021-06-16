@@ -26,6 +26,7 @@ pipeline {
       steps {
         script {
           def dpTest = sh(returnStdout:true, script:'copilot app ls | grep dp-test')
+          echo 'dpTest = ' + dpTest
           if('dp-test'.equals(dpTest)) {
             applicationExists = true
           }
