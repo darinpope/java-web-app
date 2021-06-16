@@ -29,9 +29,11 @@ pipeline {
           if('dp-test'.equals(dpTest)) {
             applicationExists = true
           }
+          echo applicationExists
         }
       }
     }
+    /*
     stage('Initial deploy') {
       when {
         not { 
@@ -59,6 +61,7 @@ pipeline {
         sh 'copilot svc deploy --name web'
       }
     }
+    */
   }
   post {
     always {
