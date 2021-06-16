@@ -9,7 +9,7 @@ pipeline {
   stages {
     stage('Build and deploy') {
       steps {
-        sh 'copilot init --app dp-test --name web --type 'Request-Driven Web Service' --dockerfile './Dockerfile' --deploy'
+        sh 'copilot init --app dp-test --name web --type "Request-Driven Web Service" --dockerfile "./Dockerfile" --deploy'
       }
     }
   }
