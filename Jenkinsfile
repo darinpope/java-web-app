@@ -34,7 +34,6 @@ pipeline {
         }
       }
     }
-    /*
     stage('Initial deploy') {
       when {
         not { 
@@ -62,7 +61,6 @@ pipeline {
         sh 'copilot svc deploy --name web'
       }
     }
-    */
   }
   post {
     always {
