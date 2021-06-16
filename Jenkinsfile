@@ -25,7 +25,7 @@ pipeline {
     stage('Check if application is created') {
       steps {
         script {
-          def dpTest = sh(returnStdout:true, script:'copilot app ls | { grep dp-test || true; }')
+          def dpTest = sh(returnStdout:true, script:'copilot app ls | { grep dp-test || true; } | tr -d "\n"')
           echo 'dpTest = ' + String.valueOf(dpTest)
           if('dp-test'.equals(dpTest)) {
             applicationExists = true
