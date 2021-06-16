@@ -1,3 +1,5 @@
+def applicationExists = false
+def initialCreation = false
 pipeline {
   agent { label 'macos' }
   environment {
@@ -13,11 +15,48 @@ pipeline {
         sh 'security -v unlock-keychain -p $KEYCHAIN_PASSWORD ~/Library/Keychains/login.keychain-db'
       }
     }    
-    stage('Build and deploy') {
+    stage('Tooling versions') {
       steps {
         sh 'docker context use default'
         sh 'copilot --version'
+        sh 'docker --version'
+      }
+    }
+    stage('Check if application is created') {
+      steps {
+        script {
+          def dpTest = sh(returnStdout:true, script:'copilot app ls | grep dp-test')
+          if('dp-test'.equals(dpTest)) {
+            applicationExists = true
+          }
+        }
+      }
+    }
+    stage('Initial deploy') {
+      when {
+        not { 
+          expression { applicationExists }
+        }
+      }
+      steps {
         sh 'copilot init --app dp-test --name web --type "Request-Driven Web Service" --dockerfile "./Dockerfile" --deploy'
+      }
+      post {
+        always {
+          script {
+            initialCreation = true
+          }
+        }
+      }
+    }
+    stage('build and deploy') {
+      when {
+        not {
+          expression { initialCreation }
+        }
+      }
+      steps {
+        sh 'copilot svc deploy --name web'
       }
     }
   }
