@@ -9,9 +9,12 @@ pipeline {
     KEYCHAIN_PASSWORD = credentials('darinpope-keychain')
   }
   stages {
-    stage('Checkout') {
+    stage('Tooling versions') {
       steps {
-        git branch: 'docker-compose', url: 'https://github.com/darinpope/java-web-app.git'
+        sh '''
+          docker --version
+          docker compose version
+        '''
       }
     }
     stage('Unlock keychain') {
