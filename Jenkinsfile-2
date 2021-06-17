@@ -31,7 +31,7 @@ pipeline {
     }
     stage('Deploy') {
       steps {
-        sh 'docker context use darinpope-ecs-context'
+        sh 'docker context use myecscontext'
         sh 'docker compose up'
         sh 'docker compose ps --format json'
       }
