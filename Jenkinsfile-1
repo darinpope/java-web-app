@@ -6,9 +6,12 @@ pipeline {
   stages {
     stage('Tooling versions') {
       steps {
-        sh 'docker context use default'
-        sh 'copilot --version'
-        sh 'docker --version'
+        sh '''
+          docker context use default
+          copilot --version
+          docker --version
+          docker compose version
+        '''
       }
     }
   }
