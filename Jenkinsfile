@@ -20,7 +20,7 @@ pipeline {
         }
       }
       steps {
-        sh 'jfrog -v'
+        sh 'jfrog rt upload --url http://192.168.1.3:8082/artifactory/ --user ${ARTIFACTORY_CREDS_USR} --password ${ARTIFACTORY_CREDS_PSW} target/demo-0.0.1-SNAPSHOT.jar java-web-app/'
       }
     }
   }
