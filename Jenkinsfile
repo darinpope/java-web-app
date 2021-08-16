@@ -5,6 +5,7 @@ pipeline {
   }
   environment {
     CI = true
+    ARTIFACTORY_ACCESS_TOKEN = credentials('artifactory-access-token')
   }
   stages {
     stage('Build') {
@@ -20,7 +21,7 @@ pipeline {
         }
       }
       steps {
-        sh 'jfrog rt upload --url http://192.168.1.3:8082/artifactory/ --user ${ARTIFACTORY_CREDS_USR} --password ${ARTIFACTORY_CREDS_PSW} target/demo-0.0.1-SNAPSHOT.jar java-web-app/'
+        sh 'jfrog rt upload --url http://192.168.1.3:8082/artifactory/ --access-token ${ARTIFACTORY_ACCESS_TOKEN} target/demo-0.0.1-SNAPSHOT.jar java-web-app/'
       }
     }
   }
