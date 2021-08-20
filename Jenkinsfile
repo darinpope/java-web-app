@@ -4,41 +4,18 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   environment {
-    HEROKU_API_KEY = credentials('darinpope-heroku-api-key')
-  }
-  parameters { 
-    string(name: 'APP_NAME', defaultValue: '', description: 'What is the Heroku app name?') 
+    STACKHAWK_API_KEY = credentials('stackhawk-api-key')
   }
   stages {
-    stage('Build') {
-      steps {
-        sh 'docker build -t darinpope/java-web-app:latest .'
-      }
-    }
-    stage('Login') {
-      steps {
-        sh 'echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com'
-      }
-    }
-    stage('Push to Heroku registry') {
+    stage("Run HawkScan Test") {
       steps {
         sh '''
-          docker tag darinpope/java-web-app:latest registry.heroku.com/$APP_NAME/web
-          docker push registry.heroku.com/$APP_NAME/web
+          docker run -v ${WORKSPACE}:/hawk:rw -t \
+            -e API_KEY=${STACKHAWK_API_KEY} \
+            -e NO_COLOR=true \
+            stackhawk/hawkscan
         '''
       }
-    }
-    stage('Release the image') {
-      steps {
-        sh '''
-          heroku container:release web --app=$APP_NAME
-        '''
-      }
-    }
-  }
-  post {
-    always {
-      sh 'docker logout'
     }
   }
 }
