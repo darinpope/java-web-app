@@ -10,7 +10,7 @@ pipeline {
     stage("Run HawkScan Test") {
       steps {
         sh '''
-          docker run -v ${WORKSPACE}:/hawk:rw -t \
+          docker run -v ${WORKSPACE}:/hawk:rw --rm -t \
             -e API_KEY=${STACKHAWK_API_KEY} \
             -e NO_COLOR=true \
             stackhawk/hawkscan
