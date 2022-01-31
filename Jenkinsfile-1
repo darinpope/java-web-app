@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'linux' }
+  agent { label 'centos' }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
