@@ -11,7 +11,7 @@ pipeline {
     }
     stage('Scan') {
       steps {
-        sh 'trivy --exit-code 1 --severity HIGH,CRITICAL darinpope/java-web-app:latest'
+        sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL darinpope/java-web-app:latest'
       }
     }
   }
