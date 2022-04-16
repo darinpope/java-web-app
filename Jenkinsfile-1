@@ -1,5 +1,5 @@
 pipeline {
-  agent { docker { image 'maven:3.9.0' } }
+  agent { label 'master' }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
