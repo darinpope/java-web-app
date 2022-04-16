@@ -1,10 +1,7 @@
 pipeline {
-  agent { label 'linux' }
+  agent { label 'ubunta' }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
-  }
-  tools {
-      maven '3.8.1'
   }
   stages {
     stage('Scan') {
