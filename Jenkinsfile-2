@@ -11,10 +11,12 @@ withSonarQubeEnv()
 bat "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarqubedemo"
 }
 }
+stages{
 stage("Quality Gate") {
 steps {
 timeout(time: 2, unit: 'MINUTES') {
 waitForQualityGate abortPipeline: true
+}
 }
 }
 }
