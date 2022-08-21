@@ -11,6 +11,7 @@ withSonarQubeEnv()
 bat "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonarqubedemo"
 }
 }
+
 stage("Build Result")
 {
 echo "Build Successful"
