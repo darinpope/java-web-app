@@ -18,5 +18,24 @@ pipeline {
         }
       }
     }
+    stage("Upload to Nexus"){
+      steps {
+        script {
+        dir ('/var/jenkins_home/workspace/sonar-pl') {
+          nexusArtifactUploader artifacts:
+          [[artifactId: 'NexusTest',
+          classifier: 'debug',
+          file: 'target/demo-0.0.1-SNAPSHOT.jar',
+          type: 'jar']],
+          credentialsId: 'nexus-auth',
+          groupId: 'com.example',
+          nexusUrl: 'http://172.17.0.1:8081',
+          nexusVersion: 'nexus3',
+          protocol: 'http',
+          repository: 'maven-snapshots',
+          version: '1.0-SNAPSHOT'
+          }
+        }
+    }
   }
 }
