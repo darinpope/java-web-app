@@ -14,7 +14,7 @@ pipeline {
     stage("Build Jar File"){
       steps {
         dir('/var/jenkins_home/workspace/sonar-pl') {
-          sh 'mvn -U -Dmaven.test.skip=true clean install'
+          sh './mvnw -U -Dmaven.test.skip=true clean install'
         }
       }
     }
