@@ -11,5 +11,10 @@ pipeline {
         }
       }
     }
+    stage("Build Jar File"){
+      steps {
+        sh './ mvn -U -Dmaven.test.skip=true clean install'
+      }
+    }
   }
 }
