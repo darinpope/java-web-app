@@ -28,7 +28,7 @@ pipeline {
       }
       steps {
         script {
-          dir ('/var/jenkins_home/workspace/sonar-pl') {
+          dir ('/var/jenkins_home/workspace/test-task') {
             def pomBuild = readMavenPom file: 'pom.xml'
             def type = "jar"
             def repository = "maven-snapshots"
