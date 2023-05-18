@@ -32,21 +32,18 @@ pipeline {
       }
       steps {
         script {
-          dir ('/var/jenkins_home/workspace/test-task/') {
+          dir ('/var/jenkins_home/workspace/test-task') {
             def pomBuild = readMavenPom file: 'pom.xml'
-            def artifact = pomBuild.artifactId;
-            def group = pomBuild.groupId;
-            def version = pomBuid.version;
             def type = "jar"
             def repository = "maven-snapshots"
             def env="-loc"
             nexusPublisher nexusInstanceId: 'nexus',
             nexusRepositoryId: "${repository}",
             packages: [[$class: 'MavenPackage',
-            mavenAssetList: [[classifier: '', extension: '', filePath: "target/${artifact}-${version}.${type}"]],
+            mavenAssetList: [[classifier: '', extension: '', filePath: "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"]],
             mavenCoordinate: [
-                artifactId: "${artifact}",
-                groupId: "${group}",
+                artifactId: "${pomBuild.artifactId}",
+                groupId: "${pomBuild.groupId}",
                 packaging: "${type}",
                 version: "${pomBuild.version}${env}"]
             ]]
