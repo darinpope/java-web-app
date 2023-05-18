@@ -1,28 +1,39 @@
 pipeline {
-  agent {
-    docker {
-      image 'maven:3.6.3-jdk-11'
-    }
-  }
+  agent none
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   stages {
     stage('Scan') {
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
+        }
+      }
       steps {
         withSonarQubeEnv(installationName: 'sonar') { 
-          sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+          sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
         }
       }
     }
     stage("Build Jar File"){
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
+        }
+      }
       steps {
         dir('/var/jenkins_home/workspace/test-task') {
-          sh './mvnw -U -Dmaven.test.skip=true clean install'
+          sh 'mvn -U -Dmaven.test.skip=true clean install'
         }
       }
     }
     stage("Upload to Nexus"){
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
+        }
+      }
       steps {
         script {
           dir ('/var/jenkins_home/workspace/test-task') {
