@@ -19,6 +19,11 @@ pipeline {
       }
     }
     stage("Upload to Nexus"){
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
+        }
+      }
       steps {
         script {
           dir ('/var/jenkins_home/workspace/sonar-pl') {
