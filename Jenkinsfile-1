@@ -1,17 +1,16 @@
 pipeline {
-  agent none
+  agent {
+    docker {
+      image 'maven:3.6.3-jdk-11'
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
+      reuseNode true
+    }
+  }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   stages {
     stage('Scan') {
-      agent {
-        docker {
-          image 'maven:3.6.3-jdk-11'
-          args '-v /var/run/docker.sock:/var/run/docker.sock'
-          reuseNode true
-        }
-      }
       steps {
         withSonarQubeEnv(installationName: 'sonar') { 
           sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
