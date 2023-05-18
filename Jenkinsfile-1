@@ -5,16 +5,11 @@ pipeline {
   }
   stages {
     stage('Scan') {
-      agent {
-        docker {
-          image 'maven:3.6.3-jdk-11'
-        }
-      } 
+      agent any
       steps {
         withSonarQubeEnv(installationName: 'sonar') { 
-          sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+          sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
         }
-      }
     }
     stage("Build Jar File"){
       agent {
