@@ -7,7 +7,7 @@ pipeline {
     stage('Scan') {
       agent any
       steps {
-        withSonarQubeEnv(installationName: 'sonar-jorge') { 
+        withSonarQubeEnv(installationName: 'sonar') { 
           sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
         }
       }
@@ -15,7 +15,7 @@ pipeline {
     stage("Build Jar File"){
       agent any 
       steps {
-        dir('/var/jenkins_home/workspace/sonar-pl') {
+        dir('/var/jenkins_home/workspace/test-task') {
           sh './mvnw -U -Dmaven.test.skip=true clean install'
         }
       }
