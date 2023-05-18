@@ -5,10 +5,14 @@ pipeline {
   }
   stages {
     stage('Scan') {
-      agent any
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
+        }
+      } 
       steps {
         withSonarQubeEnv(installationName: 'sonar') { 
-          sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+          sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
         }
       }
     }
@@ -16,7 +20,7 @@ pipeline {
       agent any 
       steps {
         dir('/var/jenkins_home/workspace/test-task') {
-          sh './mvnw -U -Dmaven.test.skip=true clean install'
+          sh 'mvn -U -Dmaven.test.skip=true clean install'
         }
       }
     }
