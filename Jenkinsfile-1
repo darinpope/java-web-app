@@ -22,18 +22,20 @@ pipeline {
       steps {
         script {
           dir ('/var/jenkins_home/workspace/sonar-pl') {
-            nexusArtifactUploader artifacts:
-            [[artifactId: 'NexusTest',
-            classifier: 'debug',
-            file: 'target/demo-0.0.1-SNAPSHOT.jar',
-            type: 'jar']],
-            credentialsId: 'nexus-auth',
-            groupId: 'com.example',
-            nexusUrl: 'http://172.17.0.1:8081',
-            nexusVersion: 'nexus3',
-            protocol: 'http',
-            repository: 'maven-snapshots',
-            version: '1.0-SNAPSHOT'
+            def pomBuild = readMavenPom file: 'pom.xml'
+            def type = "jar"
+            def repository = "maven-snapshots"
+            def env="-loc"
+            nexusPublisher nexusInstanceId: 'nexus',
+            nexusRepositoryId: "${repository}",
+            packages: [[$class: 'MavenPackage',
+            mavenAssetList: [[classifier: '', extension: '', filePath: "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"]],
+            mavenCoordinate: [
+                artifactId: "${pomBuild.artifactId}",
+                groupId: "${pomBuild.groupId}",
+                packaging: "${type}",
+                version: "${pomBuild.version}${env}"]
+            ]]
           }
         }
       }
