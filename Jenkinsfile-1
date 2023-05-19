@@ -42,7 +42,7 @@ pipeline {
 
             if (fileExists(file: route)) {
                 def newFile = "target/demo-0.0.1-RELEASE.jar"
-                writeFile(file: newFile, encoding: "UTF-8", text: readFile(file: sourceFile, encoding: "UTF-8"))
+                writeFile(file: newFile, encoding: "UTF-8", text: readFile(file: route, encoding: "UTF-8"))
             }
             nexusPublisher nexusInstanceId: 'nexus',
             nexusRepositoryId: "${repository}",
