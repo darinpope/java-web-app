@@ -33,6 +33,7 @@ pipeline {
       steps {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
+            /*
             def pomBuild = readMavenPom file: 'pom.xml'
             def type = "jar"
             def repository = "maven-snapshots"
@@ -48,6 +49,14 @@ pipeline {
                 packaging: "${type}",
                 version: "${pomBuild.version}"]
             ]]
+            */
+
+            def pomBuild = readMavenPom file: 'pom.xml'
+            def type = "jar"
+            def repository = "maven-snapshots"
+            def env = "-dev"
+            sh "mvn deploy:deploy-file -DgroupId=${pomBuild.groupId} -DartifactId=${pomBuild.artifactId} -Dversion=${pomBuild.version} -Dpackaging=${type} -Dfile=target/${pomBuild.artifactId}-${pomBuild.version}.${type} -DrepositoryId=${repository} -Durl=http://nexus:8081/repository/${repository}"
+
           }
         }
       }
