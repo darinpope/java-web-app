@@ -55,7 +55,7 @@ pipeline {
             def type = "jar"
             def repository = "maven-snapshots"
             def env = "-dev"
-            sh "mvn deploy:deploy-file -DgroupId=${pomBuild.groupId} -DartifactId=${pomBuild.artifactId} -Dversion=${pomBuild.version} -Dpackaging=${type} -Dfile=target/${pomBuild.artifactId}-${pomBuild.version}.${type} -DrepositoryId=${repository} -Durl=http://nexus:8081/repository/${repository}"
+            sh "mvn deploy:deploy-file -DgroupId=${pomBuild.groupId} -DartifactId=${pomBuild.artifactId} -Dversion=${pomBuild.version} -Dpackaging=${type} -Dfile=target/${pomBuild.artifactId}-${pomBuild.version}.${type} -DrepositoryId=${repository} -Durl=http://localhost:8081/repository/${repository}"
 
           }
         }
