@@ -35,18 +35,24 @@ pipeline {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
             def pomBuild = readMavenPom file: 'pom.xml'
             def type = "jar"
-            def repository = "maven-test-repository"
+            def repository = "maven-test-release"
             def env = "-dev"
-            echo "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"
+
+            def route = "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"
+
+            if (fileExists(file: route)) {
+                def newFile = "target/demo-0.0.1-RELEASE.jar"
+                writeFile(file: newFile, encoding: "UTF-8", text: readFile(file: sourceFile, encoding: "UTF-8"))
+            }
             nexusPublisher nexusInstanceId: 'nexus',
             nexusRepositoryId: "${repository}",
             packages: [[$class: 'MavenPackage',
-            mavenAssetList: [[classifier: '', extension: '', filePath: "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"]],
+            mavenAssetList: [[classifier: '', extension: '', filePath: "target/demo-0.0.1-RELEASE.jar"]],
             mavenCoordinate: [
                 artifactId: "${pomBuild.artifactId}",
                 groupId: "${pomBuild.groupId}",
                 packaging: "${type}",
-                version: "${pomBuild.version}"]
+                version: "-RELEASE"]
             ]]
           }
         }
