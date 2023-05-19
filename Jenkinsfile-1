@@ -39,7 +39,7 @@ pipeline {
             nexusPublisher nexusInstanceId: 'nexus',
             nexusRepositoryId: "${repository}",
             packages: [[$class: 'MavenPackage',
-            mavenAssetList: [[classifier: '', extension: '', filePath: "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"]],
+            mavenAssetList: [[classifier: '', extension: '', filePath: "target/demo-0.0.1-SNAPSHOT.jar"]],
             mavenCoordinate: [
                 artifactId: "${pomBuild.artifactId}",
                 groupId: "${pomBuild.groupId}",
