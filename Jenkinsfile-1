@@ -36,9 +36,7 @@ pipeline {
             def pomBuild = readMavenPom file: 'pom.xml'
             def type = "jar"
             def repository = "maven-snapshots"
-            echo ${pomBuild.artifactId}
-            echo $(pomBuild.groupId)
-            echo ${pomBuild.version}
+            echo "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"
             nexusPublisher nexusInstanceId: 'nexus',
             nexusRepositoryId: "${repository}",
             packages: [[$class: 'MavenPackage',
