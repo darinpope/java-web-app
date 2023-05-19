@@ -36,7 +36,6 @@ pipeline {
             def pomBuild = readMavenPom file: 'pom.xml'
             def type = "jar"
             def repository = "maven-snapshots"
-            def env="-loc"
             nexusPublisher nexusInstanceId: 'nexus',
             nexusRepositoryId: "${repository}",
             packages: [[$class: 'MavenPackage',
@@ -45,7 +44,7 @@ pipeline {
                 artifactId: "${pomBuild.artifactId}",
                 groupId: "${pomBuild.groupId}",
                 packaging: "${type}",
-                version: "${pomBuild.version}${env}"]
+                version: "${pomBuild.version}"]
             ]]
           }
         }
