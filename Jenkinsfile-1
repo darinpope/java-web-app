@@ -19,7 +19,7 @@ pipeline {
         }
       }
       steps {
-        dir('/var/jenkins_home/workspace/test-task') {
+        dir('/var/lib/jenkins/workspace/test-task') {
           sh 'mvn -U -Dmaven.test.skip=true clean install'
         }
       }
@@ -32,7 +32,7 @@ pipeline {
       }
       steps {
         script {
-          dir ('/var/jenkins_home/workspace/test-task') {
+          dir ('/var/lib/jenkins/workspace/test-task') {
             def pomBuild = readMavenPom file: 'pom.xml'
             def type = "jar"
             def repository = "maven-snapshots"
