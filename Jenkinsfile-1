@@ -46,7 +46,7 @@ pipeline {
                 artifactId: "${pomBuild.artifactId}",
                 groupId: "${pomBuild.groupId}",
                 packaging: "${type}",
-                version: "${pomBuild.version}${env}"]
+                version: "${pomBuild.version}"]
             ]]
           }
         }
