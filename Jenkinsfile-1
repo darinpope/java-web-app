@@ -35,7 +35,7 @@ pipeline {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
             def pomBuild = readMavenPom file: 'pom.xml'
             def type = "jar"
-            def repository = "maven-snapshots"
+            def repository = "maven-test-repository"
             def env = "-dev"
             echo "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"
             nexusPublisher nexusInstanceId: 'nexus',
