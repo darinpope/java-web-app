@@ -58,5 +58,16 @@ pipeline {
         }
       }
     }
+    stage("Deploy") {
+      agent any
+      steps {
+        script{         
+          //scp -o StrictHostKeyChecking=no target/*.jar user@host:/home/ubuntu           
+          sshagent ( credentials: ['deploy-server']){
+            sh """ssh user@host '/home/ubuntu/deploy.sh'""" 
+          }
+        }
+      }
+    }
   }
 }
