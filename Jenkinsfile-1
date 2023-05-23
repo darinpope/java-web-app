@@ -64,7 +64,7 @@ pipeline {
         script{         
           //scp -o StrictHostKeyChecking=no target/*.jar user@host:/home/ubuntu           
           sshagent ( credentials: ['deploy-server']){
-            sh """ssh jorge@192.168.1.71 '~/remote-host/deploy.sh'""" 
+            sh """ssh jorge@192.168.1.71'""" 
           }
         }
       }
