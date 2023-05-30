@@ -64,11 +64,7 @@ pipeline {
     }
 
     stage("Upload image to Nexus"){
-      agent {
-        docker {
-          image 'maven:3.6.3-jdk-11'
-        }
-      }
+      agent any
       steps {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task'){
