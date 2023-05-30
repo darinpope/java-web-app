@@ -71,7 +71,7 @@ pipeline {
             withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'atomic', usernameVariable: 'admin')]) {
               def pomBuild = readMavenPom file: 'pom.xml'
               def repoDocker = "localhost:8085/${pomBuild.artifactId}"
-              sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+              sh "docker login -u ${env.usernameVariable} -p ${env.passwordVariable}"
               sh "docker build -f Dockerfile -t ${pomBuild.artifactId}:${pomBuild.version} ."
               sh "docker ps -a"
               sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:${pomBuild.version}"
