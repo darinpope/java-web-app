@@ -67,7 +67,7 @@ pipeline {
       }
       steps {
         script {
-          dir ("/home/jcantu/.jenkins/workspace/test-task"){
+          dir ('/home/jcantu/.jenkins/workspace/test-task'){
             // withCredentials([usernamePassword(credentialsId: 'docker-credential', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
             def pomBuild = readMavenPom file: 'pom.xml'
             def repoDocker = "localhost:8085/${pomBuild.artifactId}"
