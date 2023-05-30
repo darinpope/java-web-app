@@ -68,22 +68,22 @@ pipeline {
       steps {
         script {
           dir ("/home/jcantu/.jenkins/workspace/test-task"){
-             withCredentials([usernamePassword(credentialsId: 'docker-credential', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-              def pomBuild = readMavenPom file: 'pom.xml'
-              def repoDocker = "localhost:8085/${pomBuild.artifactId}"
-              sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-              sh "docker build -f Dockerfile -t ${pomBuild.artifactId}:${pomBuild.version} ."
-              sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:${pomBuild.version}"
-              sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:latest"
-              sh "docker push ${repoDocker}:${pomBuild.version}"
-              sh "docker push ${repoDocker}:latest"
-              sh "docker logout"
-              sh "docker rmi -f ${pomBuild.artifactId}:${pomBuild.version}"
-              sh "docker rmi -f ${repoDocker}:${pomBuild.version}"
-              sh "docker rmi -f ${repoDocker}:latest"
-              sh "docker image prune -f"
-              sh "docker builder prune -f"
-            }
+            // withCredentials([usernamePassword(credentialsId: 'docker-credential', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+            def pomBuild = readMavenPom file: 'pom.xml'
+            def repoDocker = "localhost:8085/${pomBuild.artifactId}"
+            sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+            sh "docker build -f Dockerfile -t ${pomBuild.artifactId}:${pomBuild.version} ."
+            sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:${pomBuild.version}"
+            sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:latest"
+            sh "docker push ${repoDocker}:${pomBuild.version}"
+            sh "docker push ${repoDocker}:latest"
+            sh "docker logout"
+            sh "docker rmi -f ${pomBuild.artifactId}:${pomBuild.version}"
+            sh "docker rmi -f ${repoDocker}:${pomBuild.version}"
+            sh "docker rmi -f ${repoDocker}:latest"
+            sh "docker image prune -f"
+            sh "docker builder prune -f"
+            //}
           }
         }
       }
