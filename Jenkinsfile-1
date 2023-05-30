@@ -68,10 +68,10 @@ pipeline {
       steps {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task'){
-            withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'atomic', usernameVariable: 'admin')]) {
+            withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
               def pomBuild = readMavenPom file: 'pom.xml'
               def repoDocker = "localhost:8085/${pomBuild.artifactId}"
-              sh "docker login localhost:8085"
+              sh "docker login -u ${USR} -p ${PWD}"
               sh "docker build -f Dockerfile -t ${pomBuild.artifactId}:${pomBuild.version} ."
               sh "docker ps -a"
               sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:${pomBuild.version}"
