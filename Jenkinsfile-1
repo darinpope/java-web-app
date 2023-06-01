@@ -96,7 +96,7 @@ pipeline {
           dir ('/home/jcantu/.jenkins/workspace/test-task'){
             withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
               def pomBuild = readMavenPom file: 'pom.xml'
-              def port = 9100
+              def port = 8085
               def type = "jar"         
               //scp -o StrictHostKeyChecking=no target/*.jar user@host:/home/ubuntu           
               sshagent ( credentials: ['deploy-server']){
