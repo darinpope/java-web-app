@@ -15,6 +15,7 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
+		<sonar.projectKey>project-test</sonar.projectKey> <!-- Agrega la clave del proyecto de SonarQube -->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -47,7 +48,11 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.sonarsource.scanner.maven</groupId>
+				<artifactId>sonar-maven-plugin</artifactId>
+				<version>3.9.1.2184</version> <!-- Actualiza la versión del plugin de SonarQube -->
+			</plugin>
 		</plugins>
 	</build>
-
 </project>
