@@ -8,12 +8,22 @@ pipeline {
     dockerHubPassword = "atomic"
   }
   stages {
-    stage('Scan') {
-      agent any
-      steps {
-        withSonarQubeEnv(installationName: 'sonar') { 
-          sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+    stage('Quality') {
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
         }
+      }
+      steps {
+          script{
+            withSonarQubeEnv('sonarqube-server') {
+                sh 'mvn sonar:sonar -B -ntp -Dsonar.projectKey=project-test'
+            }
+            def qg = waitForQualityGate()                  
+            if (qg.status != 'OK') {
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
+            }
+          }              
       }
     }
     stage("Build Jar File"){
