@@ -16,7 +16,7 @@ pipeline {
       }
       steps {
           script{
-            withSonarQubeEnv('sonarqube-server') {
+            withSonarQubeEnv('sonar') {
                 sh 'mvn sonar:sonar -B -ntp -Dsonar.projectKey=project-test'
             }
             def qg = waitForQualityGate()                  
