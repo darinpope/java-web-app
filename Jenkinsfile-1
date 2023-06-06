@@ -19,6 +19,7 @@ pipeline {
             withSonarQubeEnv('sonar') {
                 sh 'mvn sonar:sonar -B -ntp -Dsonar.projectKey=project-test'
             }
+            sleep 15
             timeout(time: 2, unit: 'MINUTES') {
               def qg = waitForQualityGate()                  
               if (qg.status != 'OK') {
