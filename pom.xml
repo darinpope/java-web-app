@@ -16,7 +16,27 @@
 	<properties>
 		<java.version>11</java.version>
 		<sonar.projectKey>project-test</sonar.projectKey> <!-- Agrega la clave del proyecto de SonarQube -->
+		<nexus.host>http://192.168.1.69</nexus.host> <!-- Reemplaza "tu-host-nexus" con la URL de tu Nexus -->
+		<nexus.port>8081</nexus.port> <!-- Reemplaza "tu-puerto-nexus" con el puerto de tu Nexus -->
 	</properties>
+	<repositories>
+		<repository>
+			<id>test</id>
+			<url>http://${nexus.host}:${nexus.port}/repository/test-group/</url>
+		</repository>
+	</repositories>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>test</id>
+			<url>http://${nexus.host}:${nexus.port}/repository/test-snapshot/</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
+		<repository>
+			<id>test</id>
+			<url>http://${nexus.host}:${nexus.port}/repository/test-release/</url>
+			<uniqueVersion>false</uniqueVersion>
+		</repository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -33,7 +53,6 @@
 			<artifactId>spring-cloud-starter-vault-config</artifactId>
 			<version>3.0.5</version>
 		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.springframework.vault/spring-vault-core -->
 		<dependency>
 			<groupId>org.springframework.vault</groupId>
@@ -41,7 +60,6 @@
 			<version>2.3.2</version>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>

@@ -50,32 +50,13 @@ pipeline {
       steps {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
-            def pomBuild = readMavenPom file: 'pom.xml'
-            def type = pomBuild.packaging ?: 'jar' // Obtiene el tipo de archivo del pom.xml
-            def repository = "maven-test-release"
-            def env = "-dev"
-
-            def route = "target/${pomBuild.artifactId}-${pomBuild.version}.${type}"
-
-            if (fileExists(file: route)) {
-                def newFile = "target/demo-0.0.1-RELEASE.jar"
-                writeFile(file: newFile, encoding: "UTF-8", text: readFile(file: route, encoding: "UTF-8"))
+            withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+              sh 'mvn clean -s settings.xml -U -B -ntp deploy -Dmaven.test.skip=true -DGFB_MVN_NEXUS_USR='$USR' -DGFB_MVN_NEXUS_PWD=$'$PSW''
             }
-            nexusPublisher nexusInstanceId: 'nexus',
-            nexusRepositoryId: "${repository}",
-            packages: [[$class: 'MavenPackage',
-            mavenAssetList: [[classifier: '', extension: '', filePath: "target/demo-0.0.1-RELEASE.jar"]],
-            mavenCoordinate: [
-                artifactId: "${pomBuild.artifactId}",
-                groupId: "${pomBuild.groupId}",
-                packaging: "${type}",
-                version: "-RELEASE"]
-            ]]
           }
         }
       }
     }
-
     stage("Upload image to Nexus"){
       agent any
       steps {
