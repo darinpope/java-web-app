@@ -49,10 +49,7 @@ pipeline {
       steps {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
-            def pom = readMavenPom file: 'pom.xml'
-            def artifactId = pom.artifactId
-            def version = pom.version
-            sh "mvn -s ./settings.xml deploy:deploy-file -DgeneratePom=false -DrepositoryId=nexus -Durl=${env.repository} -DpomFile=pom.xml -Dfile=target/${artifactId}-${version}.jar"
+            sh "mvn clean -s ./settings.xml -U -B -ntp deploy -Dmaven.test.skip=true"
           }
         }
       }

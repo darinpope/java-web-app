@@ -15,19 +15,19 @@
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
-		<sonar.projectKey>project-test</sonar.projectKey> <!-- Agrega la clave del proyecto de SonarQube -->
-		<nexus.host>localhost</nexus.host> <!-- Reemplaza "tu-host-nexus" con la URL de tu Nexus -->
-		<nexus.port>8081</nexus.port> <!-- Reemplaza "tu-puerto-nexus" con el puerto de tu Nexus -->
+		<sonar.projectKey>project-test</sonar.projectKey> 
+		<nexus.host>localhost</nexus.host> 
+		<nexus.port>8081</nexus.port> 
 	</properties>
 
 	<distributionManagement>
 		<snapshotRepository>
-			<id>snapshot</id>
+			<id>nexus</id>
 			<url>http://${nexus.host}:${nexus.port}/repository/test-snapshot/</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 		<repository>
-			<id>release</id>
+			<id>nexus</id>
 			<url>http://${nexus.host}:${nexus.port}/repository/test-release/</url>
 			<uniqueVersion>false</uniqueVersion>
 		</repository>
@@ -65,7 +65,7 @@
 			<plugin>
 				<groupId>org.sonarsource.scanner.maven</groupId>
 				<artifactId>sonar-maven-plugin</artifactId>
-				<version>3.9.1.2184</version> <!-- Actualiza la versión del plugin de SonarQube -->
+				<version>3.9.1.2184</version> 
 			</plugin>
 		</plugins>
 	</build>
