@@ -4,8 +4,6 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   environment {
-    dockerHubUser = "admin"
-    dockerHubPassword = "atomic"
     repository = "http://192.168.1.69:8081/repository/test-snapshot/"
   }
   stages {
@@ -55,8 +53,7 @@ pipeline {
               def pom = readMavenPom file: 'pom.xml'
               def artifactId = pom.artifactId
               def version = pom.version
-              sh "mvn deploy:deploy-file -DgeneratePom=false -DrepositoryId=nexus -Durl=${env.repository} -DpomFile=pom.xml -Dfile=target/${artifactId}-${version}.jar"
-
+              sh "mvn deploy:deploy-file -DgeneratePom=false -DrepositoryId=nexus -Durl=${env.repository} -DpomFile=pom.xml -Dfile=target/${artifactId}-${version}.jar -Dusername=${USR} -Dpassword=${PSW}"
             }
           }
         }
