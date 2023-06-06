@@ -49,12 +49,10 @@ pipeline {
       steps {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
-            withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-              def pom = readMavenPom file: 'pom.xml'
-              def artifactId = pom.artifactId
-              def version = pom.version
-              sh "mvn deploy:deploy-file -DgeneratePom=false -DrepositoryId=nexus -Durl=${env.repository} -DpomFile=pom.xml -Dfile=target/${artifactId}-${version}.jar -Dusername=${USR} -Dpassword=atomic"
-            }
+            def pom = readMavenPom file: 'pom.xml'
+            def artifactId = pom.artifactId
+            def version = pom.version
+            sh "mvn -s ./settings.xml deploy:deploy-file -DgeneratePom=false -DrepositoryId=nexus -Durl=${env.repository} -DpomFile=pom.xml -Dfile=target/${artifactId}-${version}.jar"
           }
         }
       }
