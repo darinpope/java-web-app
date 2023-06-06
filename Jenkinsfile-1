@@ -53,7 +53,7 @@ pipeline {
               def pom = readMavenPom file: 'pom.xml'
               def artifactId = pom.artifactId
               def version = pom.version
-              sh "mvn deploy:deploy-file -DgeneratePom=false -DrepositoryId=nexus -Durl=${env.repository} -DpomFile=pom.xml -Dfile=target/${artifactId}-${version}.jar -Dusername=${USR} -Dpassword=${PSW}"
+              sh "mvn deploy:deploy-file -DgeneratePom=false -DrepositoryId=nexus -Durl=${env.repository} -DpomFile=pom.xml -Dfile=target/${artifactId}-${version}.jar -Dusername=${USR} -Dpassword=atomic"
             }
           }
         }
