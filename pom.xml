@@ -16,7 +16,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<sonar.projectKey>project-test</sonar.projectKey> <!-- Agrega la clave del proyecto de SonarQube -->
-		<nexus.host>http://192.168.1.69</nexus.host> <!-- Reemplaza "tu-host-nexus" con la URL de tu Nexus -->
+		<nexus.host>192.168.1.69</nexus.host> <!-- Reemplaza "tu-host-nexus" con la URL de tu Nexus -->
 		<nexus.port>8081</nexus.port> <!-- Reemplaza "tu-puerto-nexus" con el puerto de tu Nexus -->
 	</properties>
 	<repositories>
