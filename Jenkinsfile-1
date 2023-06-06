@@ -51,6 +51,11 @@ pipeline {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
             withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+              def password = ${PSW}
+              def user = ${USR}
+              sh "echo $user"
+              sh "echo $password"
+              echo password
               sh 'mvn clean -s settings.xml -U -B -ntp deploy -Dmaven.test.skip=true -DGFB_MVN_NEXUS_USR='${USR}' -DGFB_MVN_NEXUS_PWD=$'${PSW}''
             }
           }
