@@ -6,7 +6,7 @@ pipeline {
   environment {
     dockerHubUser = "admin"
     dockerHubPassword = "atomic"
-    repository = "http://localhost:8081/repository/test-snapshot/"
+    repository = "http://192.168.1.69:8081/repository/test-snapshot/"
   }
   stages {
     stage('Quality') {
