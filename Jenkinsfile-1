@@ -6,6 +6,7 @@ pipeline {
   environment {
     dockerHubUser = "admin"
     dockerHubPassword = "atomic"
+    repository = "http://localhost:8081/repository/test-snapshot/"
   }
   stages {
     stage('Quality') {
@@ -51,7 +52,11 @@ pipeline {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
             withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
-              sh "mvn clean -s settings.xml -U -B -ntp deploy -Dmaven.test.skip=true"
+              def pom = readMavenPom file: 'pom.xml'
+              def artifactId = pom.artifactId
+              def version = pom.version
+              sh "mvn deploy:deploy-file -DgeneratePom=false -DrepositoryId=nexus -Durl=${env.repository} -DpomFile=pom.xml -Dfile=target/${artifactId}-${version}.jar"
+
             }
           }
         }
