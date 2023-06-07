@@ -3,7 +3,7 @@ FROM amazoncorretto:11.0.18
 ARG APP_PORT
 
 ENV TZ=America/Mexico_City
-ENV APP_PORT=${PORT}
+ENV PORT=${APP_PORT}
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
@@ -13,4 +13,4 @@ COPY ./run.sh run.sh
 RUN chmod +x run.sh
 
 ENTRYPOINT ["./run.sh"]
-CMD [$APP_PORT]
+CMD [$PORT]
