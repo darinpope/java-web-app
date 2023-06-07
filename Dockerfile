@@ -9,4 +9,6 @@ COPY ./run.sh run.sh
 
 RUN chmod +x run.sh
 
-ENTRYPOINT ["./run.sh"]
+ENV PORT=8085
+
+ENTRYPOINT ["./run.sh", "$PORT"]

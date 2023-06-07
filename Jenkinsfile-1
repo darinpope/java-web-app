@@ -60,10 +60,11 @@ pipeline {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task'){
             withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
+              def port = params.PORT
               def pomBuild = readMavenPom file: 'pom.xml'
               def repoDocker = "localhost:8085/${pomBuild.artifactId}"
               sh "echo ${PSW} | docker login -u ${USR} --password-stdin localhost:8085"
-              sh "docker build -f Dockerfile -t ${pomBuild.artifactId}:${pomBuild.version} ."
+              sh "docker build -f Dockerfile --build-arg PORT=${port} -t ${pomBuild.artifactId}:${pomBuild.version} ."
               sh "docker ps -a"
               sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:${pomBuild.version}"
               sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:latest"
