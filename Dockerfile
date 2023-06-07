@@ -1,18 +1,12 @@
-FROM adoptopenjdk/openjdk11:alpine-slim as build
-WORKDIR /workspace/app
+FROM amazoncorretto:11.0.18
 
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
+ENV TZ=America/Mexico_City
 
-RUN ./mvnw install -DskipTests
-RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-FROM adoptopenjdk/openjdk11:alpine-slim
-VOLUME /tmp
-ARG DEPENDENCY=/workspace/app/target/dependency
-COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
-COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
-COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
-ENTRYPOINT ["java","-Dserver.port=${PORT}","-cp","app:app/lib/*","com.example.demo.DemoApplication"]
+COPY target/*.jar /workspace/app.jar
+COPY ./run.sh run.sh
+
+RUN chmod +x run.sh
+
+ENTRYPOINT ["./run.sh"]
