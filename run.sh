@@ -13,4 +13,4 @@ echo "NETTY_TMP     <$NETTY_TMP>"
 echo "SECURITY_OPT  <$SECURITY_OPT>"
 echo "JAVA_OPTS     <$JAVA_OPTS>"
 
-java $SECURITY_OPT $NETTY_TMP $JAVA_OPTS -Dserver.port=$APP_PORT -jar /workspace/app.jar
+java $SECURITY_OPT $NETTY_TMP $JAVA_OPTS -Dserver.port=$PORT -jar /workspace/app.jar
