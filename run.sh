@@ -5,6 +5,8 @@ java -version
 NOW=$(date +"%Y-%m-%d %H:%M:%S %Z")
 NETTY_TMP=-Dio.netty.native.workdir=/tmp
 SECURITY_OPT=-Djava.security.egd=file:/dev/./urandom
+# Convertir $PORT a entero
+PORT=$(printf '%d' "$APP_PORT")
 
 echo
 echo "TZ            <$TZ>"
