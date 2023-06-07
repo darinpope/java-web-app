@@ -64,6 +64,7 @@ pipeline {
               def pomBuild = readMavenPom file: 'pom.xml'
               def repoDocker = "localhost:8085/${pomBuild.artifactId}"
               sh "echo ${PSW} | docker login -u ${USR} --password-stdin localhost:8085"
+              echo "${port}"
               sh "docker build -f Dockerfile --build-arg PORT=${port} -t ${pomBuild.artifactId}:${pomBuild.version} ."
               sh "docker ps -a"
               sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:${pomBuild.version}"
