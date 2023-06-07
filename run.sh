@@ -5,7 +5,7 @@ java -version
 NOW=$(date +"%Y-%m-%d %H:%M:%S %Z")
 NETTY_TMP=-Dio.netty.native.workdir=/tmp
 SECURITY_OPT=-Djava.security.egd=file:/dev/./urandom
-PORT=$1
+PORT=$(echo "$1" | awk '{print $0+0}')  # Convertir a entero
 
 echo
 echo "TZ            <$TZ>"
