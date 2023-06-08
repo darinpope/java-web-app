@@ -3,9 +3,6 @@ pipeline {
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
-  environment {
-    repository = "http://192.168.1.69:8081/repository/test-snapshot/"
-  }
   stages {
     stage("Build"){
       agent {
@@ -112,7 +109,7 @@ pipeline {
               sh "docker ps -a"
               //Assign tag to the image
               sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:${pomBuild.version}"
-              //Pus image to repository
+              //Push image to repository
               sh "docker push ${repoDocker}:${pomBuild.version}"
               sh "docker logout"
               sh "docker rmi -f ${pomBuild.artifactId}:${pomBuild.version}"
