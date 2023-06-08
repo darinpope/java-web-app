@@ -139,6 +139,15 @@ pipeline {
               def dockerPort = 8085
               def appPort = params.PORT
               def type = "jar"         
+                                  
+              if("${GIT_BRANCH}" == 'origin/master') {
+
+              } else if("${GIT_BRANCH}" == 'origin/develop') {
+                
+              } else {
+                error "The branch ${GIT_BRANCH} is not valid"                          
+              }   
+
               sshagent ( credentials: ['deploy-server']){
                 sh "ssh jorge@192.168.1.70 'ubuntu/deploy.sh' ${pomBuild.artifactId} ${pomBuild.version} ${dockerPort} ${type} ${pomBuild.groupId} ${USR} ${PSW} ${appPort}" 
               }
