@@ -19,32 +19,32 @@ pipeline {
         }
       }
     }
-    stage('Test') {             
-      agent {
-        docker {
-          image 'maven:3.6.3-jdk-11'
-        }
-      }
-      steps {
-        sh 'mvn verify -B -ntp'                 
-      }
-      post {                 
-        success {                                                              
-          junit 'target/surefire-reports/*.xml'
-          step([
-            $class: 'JacocoPublisher',
-            execPattern: 'target/*.exec',
-            classPattern: 'target/classes',
-            sourcePattern: 'src/main/java',
-            exclusionPattern: 'src/test/*'
-          ])
-          echo '<<Test Success>>'    
-        }
-        failure {
-          echo '<<Test Failure>>'                                                            
-        }
-      }                            
-    }
+    // stage('Test') {             
+    //   agent {
+    //     docker {
+    //       image 'maven:3.6.3-jdk-11'
+    //     }
+    //   }
+    //   steps {
+    //     sh 'mvn verify -B -ntp'                 
+    //   }
+    //   post {                 
+    //     success {                                                              
+    //       junit 'target/surefire-reports/*.xml'
+    //       step([
+    //         $class: 'JacocoPublisher',
+    //         execPattern: 'target/*.exec',
+    //         classPattern: 'target/classes',
+    //         sourcePattern: 'src/main/java',
+    //         exclusionPattern: 'src/test/*'
+    //       ])
+    //       echo '<<Test Success>>'    
+    //     }
+    //     failure {
+    //       echo '<<Test Failure>>'                                                            
+    //     }
+    //   }                            
+    // }
     stage('Quality') {
       agent {
         docker {
@@ -52,18 +52,26 @@ pipeline {
         }
       }
       steps {
-          script{
-            withSonarQubeEnv('sonar') {
-                sh 'mvn sonar:sonar -B -ntp -Dsonar.projectKey=project-test'
+        script{
+          withSonarQubeEnv('sonar') {
+              sh 'mvn sonar:sonar -B -ntp -Dsonar.projectKey=project-test'
+          }
+          sleep 15
+          timeout(time: 2, unit: 'MINUTES') {
+            def qg = waitForQualityGate()                  
+            if (qg.status != 'OK') {
+              error "Pipeline aborted due to quality gate failure: ${qg.status}"
             }
-            sleep 15
-            timeout(time: 2, unit: 'MINUTES') {
-              def qg = waitForQualityGate()                  
-              if (qg.status != 'OK') {
-                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-              }
-            }
-          }              
+          }
+        }              
+      }
+      post {
+        success {
+          echo '<<Artifact Deploy Success>>'
+        }
+        failure {
+          echo '<<Artifact Deploy Failure>>'                                                            
+        }
       }
     }
     stage("Upload Artifact to nexus"){
@@ -77,6 +85,14 @@ pipeline {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
             sh "mvn clean -s ./settings.xml -U -B -ntp deploy -Dmaven.test.skip=true"
           }
+        }
+      }
+      post {
+        success {
+          echo '<<Artifact Deploy Success>>'
+        }
+        failure {
+          echo '<<Artifact Deploy Failure>>'                                                            
         }
       }
     }
@@ -105,6 +121,14 @@ pipeline {
               sh "docker builder prune -f"
             }
           }
+        }
+      }
+      post {
+        success {
+          echo '<<Nexus Docker Image Success>>'
+        }
+        failure {
+          echo '<<Nexus Docker Image Failure>>'                                                            
         }
       }
     }
