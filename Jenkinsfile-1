@@ -7,6 +7,44 @@ pipeline {
     repository = "http://192.168.1.69:8081/repository/test-snapshot/"
   }
   stages {
+    stage("Build"){
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
+        }
+      }
+      steps {
+        dir('/home/jcantu/.jenkins/workspace/test-task') {
+          sh 'mvn -U -Dmaven.test.skip=true clean install -B -ntp'
+        }
+      }
+    }
+    stage('Test') {             
+      agent {
+        docker {
+          image 'maven:3.6.3-jdk-11'
+        }
+      }
+      steps {
+        sh 'mvn verify -B -ntp'                 
+      }
+      post {                 
+        success {                                                              
+          junit 'target/surefire-reports/*.xml'
+          step([
+            $class: 'JacocoPublisher',
+            execPattern: 'target/*.exec',
+            classPattern: 'target/classes',
+            sourcePattern: 'src/main/java',
+            exclusionPattern: 'src/test/*'
+          ])
+          echo '<<Test Success>>'    
+        }
+        failure {
+          echo '<<Test Failure>>'                                                            
+        }
+      }                            
+    }
     stage('Quality') {
       agent {
         docker {
@@ -26,18 +64,6 @@ pipeline {
               }
             }
           }              
-      }
-    }
-    stage("Build Jar File"){
-      agent {
-        docker {
-          image 'maven:3.6.3-jdk-11'
-        }
-      }
-      steps {
-        dir('/home/jcantu/.jenkins/workspace/test-task') {
-          sh 'mvn -U -Dmaven.test.skip=true clean install'
-        }
       }
     }
     stage("Upload Artifact to nexus"){
