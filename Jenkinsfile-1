@@ -105,18 +105,18 @@ pipeline {
               def port = params.PORT.toInteger()
               def pomBuild = readMavenPom file: 'pom.xml'
               def repoDocker = "localhost:8085/${pomBuild.artifactId}"
+              //Login to Nexus Docker Registry
               sh "echo ${PSW} | docker login -u ${USR} --password-stdin localhost:8085"
-              echo "${port}"
+              //Create Docker image from Dockerfile
               sh "docker build -f Dockerfile --build-arg PORT=${port} -t ${pomBuild.artifactId}:${pomBuild.version} ."
               sh "docker ps -a"
+              //Assign tag to the image
               sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:${pomBuild.version}"
-              sh "docker tag ${pomBuild.artifactId}:${pomBuild.version} ${repoDocker}:latest"
+              //Pus image to repository
               sh "docker push ${repoDocker}:${pomBuild.version}"
-              sh "docker push ${repoDocker}:latest"
               sh "docker logout"
               sh "docker rmi -f ${pomBuild.artifactId}:${pomBuild.version}"
               sh "docker rmi -f ${repoDocker}:${pomBuild.version}"
-              sh "docker rmi -f ${repoDocker}:latest"
               sh "docker image prune -f"
               sh "docker builder prune -f"
             }
