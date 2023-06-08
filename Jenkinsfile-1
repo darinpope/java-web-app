@@ -136,20 +136,31 @@ pipeline {
           dir ('/home/jcantu/.jenkins/workspace/test-task'){
             withCredentials([usernamePassword(credentialsId: 'nexus-auth', passwordVariable: 'PSW', usernameVariable: 'USR')]) {
               def pomBuild = readMavenPom file: 'pom.xml'
-              def dockerPort = 8085
-              def appPort = params.PORT
-              def type = "jar"         
-                                  
+              def PORT = 8085
+              def REPO_DOCKER = "${env.WEB_REPO_DOCKER}"                               
+              def WEB_TARGET_HOSTS
+              def WEB_USER_HOST
+              def WEB_USER_DIR = "${env.WEB_USER_DIR}"   
+                                
+              // Define target ip depends on the branch (prod or dev)
               if("${GIT_BRANCH}" == 'origin/master') {
-
+                  WEB_TARGET_HOSTS = "${env.WEB_PRO_TARGET_HOSTS}".split()
+                  WEB_USER_HOST = "${env.WEB_PRO_USER}"
               } else if("${GIT_BRANCH}" == 'origin/develop') {
-                
+                  WEB_TARGET_HOSTS = "${env.WEB_DEV_TARGET_HOSTS}".split()
+                  WEB_USER_HOST = "${env.WEB_DEV_USER}"
               } else {
-                error "The branch ${GIT_BRANCH} is not valid"                          
-              }   
+                  error "The branch ${GIT_BRANCH} is not valid"                          
+              }
+
+              echo "Brach: ${GIT_BRANCH}"
+              echo "Web User Host: ${WEB_USER_HOST}"
+              echo "Web Target Hosts: ${WEB_TARGET_HOSTS}"   
 
               sshagent ( credentials: ['deploy-server']){
-                sh "ssh jorge@192.168.1.70 'ubuntu/deploy.sh' ${pomBuild.artifactId} ${pomBuild.version} ${dockerPort} ${type} ${pomBuild.groupId} ${USR} ${PSW} ${appPort}" 
+                for(WEB_TARGET_HOST in WEB_TARGET_HOSTS) {
+                  sh "ssh ${WEB_USER_HOST}@${WEB_TARGET_HOST} '/srv/${WEB_USER_DIR}/exec/ci/deploy.sh' ${pomBuild.artifactId} ${pomBuild.version} ${PORT} ${REPO_DOCKER} ${USR} ${PSW} ${WEB_USER_DIR}" 
+                }
               }
             }
           }
