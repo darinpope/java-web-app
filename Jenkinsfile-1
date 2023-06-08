@@ -158,7 +158,7 @@ pipeline {
 
               sshagent ( credentials: ['deploy-server']){
                 for(WEB_TARGET_HOST in WEB_TARGET_HOSTS) {
-                  sh "ssh ${WEB_USER_HOST}@${WEB_TARGET_HOST} '/srv/${WEB_USER_DIR}/exec/ci/deploy.sh' ${pomBuild.artifactId} ${pomBuild.version} ${PORT} ${REPO_DOCKER} ${USR} ${PSW} ${WEB_USER_DIR}" 
+                  sh "ssh ${WEB_USER_HOST}@${WEB_TARGET_HOST} 'srv/${WEB_USER_DIR}/exec/ci/deploy.sh' ${pomBuild.artifactId} ${pomBuild.version} ${PORT} ${REPO_DOCKER} ${USR} ${PSW} ${WEB_USER_DIR}" 
                 }
               }
             }
