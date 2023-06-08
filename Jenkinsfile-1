@@ -74,7 +74,7 @@ pipeline {
         }
       }
     }
-    stage("Upload Artifact to nexus"){
+    stage("Artifact Nexus"){
       agent {
         docker {
           image 'maven:3.6.3-jdk-11'
@@ -96,7 +96,7 @@ pipeline {
         }
       }
     }
-    stage("Upload image to Nexus"){
+    stage("Docker Nexus"){
       agent any
       steps {
         script {
@@ -132,7 +132,7 @@ pipeline {
         }
       }
     }
-    stage("Deploy to host") {
+    stage("Deploy") {
       agent any
       steps {
         script{
@@ -142,12 +142,19 @@ pipeline {
               def dockerPort = 8085
               def appPort = params.PORT
               def type = "jar"         
-              //scp -o StrictHostKeyChecking=no target/*.jar user@host:/home/ubuntu           
               sshagent ( credentials: ['deploy-server']){
                 sh "ssh jorge@192.168.1.70 'ubuntu/deploy.sh' ${pomBuild.artifactId} ${pomBuild.version} ${dockerPort} ${type} ${pomBuild.groupId} ${USR} ${PSW} ${appPort}" 
               }
             }
           }
+        }
+      }
+      post {
+        success {
+          echo '<<Deploy Success>>'
+        }
+        failure {
+          echo '<<Deploy Failure>>'                                                            
         }
       }
     }
