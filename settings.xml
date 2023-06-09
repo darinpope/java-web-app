@@ -3,8 +3,8 @@
     <servers>
         <server>
             <id>nexus</id>
-            <username>admin</username>
-            <password>atomic</password>
+            <username>${GFB_MVN_NEXUS_USR}</username>
+			<password>${GFB_MVN_NEXUS_PWD}</password>
         </server>
     </servers>
 </settings>
