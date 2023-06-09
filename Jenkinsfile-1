@@ -1,10 +1,10 @@
 pipeline {
   agent none
-  options {
-    buildDiscarder(logRotator(numToKeepStr: '5'))
-  }
   enviroment{
     NEXUS_CREDENTIALS = credentials('nexus-auth')      
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   stages {
     stage("Build"){
