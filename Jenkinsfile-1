@@ -142,10 +142,10 @@ pipeline {
               def WEB_USER_DIR = "${env.WEB_USER_DIR}"   
                                 
               // Define target ip depends on the branch (prod or dev)
-              if("${GIT_BRANCH}" == 'origin/master') {
+              if("${GIT_BRANCH}" == 'origin/develop') {
                   WEB_TARGET_HOSTS = "${env.WEB_PRO_TARGET_HOSTS}".split()
                   WEB_USER_HOST = "${env.WEB_PRO_USER}"
-              } else if("${GIT_BRANCH}" == 'origin/develop') {
+              } else if("${GIT_BRANCH}" == 'origin/master') {
                   WEB_TARGET_HOSTS = "${env.WEB_DEV_TARGET_HOSTS}".split()
                   WEB_USER_HOST = "${env.WEB_DEV_USER}"
               } else {
