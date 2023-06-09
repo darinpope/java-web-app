@@ -1,8 +1,8 @@
 pipeline {
   agent none
-  enviroment{
+  environment {
     NEXUS_CREDENTIALS = credentials('nexus-auth')      
-  }
+  } 
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
