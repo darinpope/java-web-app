@@ -83,7 +83,7 @@ pipeline {
       steps {
         script {
           dir ('/home/jcantu/.jenkins/workspace/test-task') {
-            sh "mvn clean -s ./settings.xml -U -B -ntp deploy -Dmaven.test.skip=true"
+            sh "mvn clean -s ./settings.xml -U -B -ntp deploy -Dmaven.test.skip=true -DGFB_MVN_NEXUS_USR=$NEXUS_CREDENTIALS_USR -DGFB_MVN_NEXUS_PWD=$NEXUS_CREDENTIALS_PSW"
           }
         }
       }
