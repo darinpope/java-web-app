@@ -171,8 +171,6 @@ pipeline {
         }
       }
       post {
-        always {
-        }
         success {
           script {
             if("${GIT_BRANCH}" == 'origin/develop'){
