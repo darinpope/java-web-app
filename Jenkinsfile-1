@@ -181,7 +181,7 @@ pipeline {
                 sh "git config user.email ${COMMITER_EMAIL}"
                 sh "git config user.name ${COMMITER_USER}"
                 // sh "git tag -a -f v${pomBuild.version} -m 'Release ${pomBuild.version}'"
-                sh "eval `ssh-agent -s` && ssh-add ${SSH_KEY_PATH} && git tag -a -f v${pomBuild.version} -m 'Release ${pomBuild.version}'"
+                sh "eval `ssh-agent -s` && ssh-add ${SSH_KEY} && git tag -a -f v${pomBuild.version} -m 'Release ${pomBuild.version}'"
                 sh "git push --tags"
               }
               echo '<<Deploy Sucess>>'
