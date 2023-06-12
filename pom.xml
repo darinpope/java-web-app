@@ -18,8 +18,8 @@
 		<sonar.projectKey>project-test</sonar.projectKey> 
 		<nexus.host>192.168.1.69</nexus.host> 
 		<nexus.port>8081</nexus.port>
-		<nexus.repository.snapshots>repository/test-snapshot/</nexus.snapshots.repository>
-		<nexus.repository.releases>repository/test-release/</nexus.releases.repository>
+		<nexus.repository.snapshots>repository/test-snapshot/</nexus.repository.snapshots>
+		<nexus.repository.releases>repository/test-release/</nexus.repository.releases>
 	</properties>
 
 	<distributionManagement>
