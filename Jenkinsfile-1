@@ -171,11 +171,25 @@ pipeline {
         }
       }
       post {
+        always {
+          cleanWs()
+        }
         success {
-          echo '<<Deploy Success>>'
+          script {
+            if("${GIT_BRANCH}" == 'origin/develop'){
+              def pomBuild = readMavenPom file: 'pom.xml'
+              def COMMITER_EMAIL = "${env.JENKINS_COMMITER_EMAIL}"
+              def COMMITER_USER = "${env.JENKINS_COMMITER_USER}"
+              sh "git config user.email ${COMMITER_EMAIL}"
+              sh "git config user.name ${COMMITER_USER}"
+              sh "git tag -a -f v${pomBuild.version} -m 'Release ${pomBuild.version}'"
+              sh "git push --tags"
+            }
+            echo '<<Deploy Sucess>>'
+          }
         }
         failure {
-          echo '<<Deploy Failure>>'                                                            
+          echo '<<Deploy Failure>>'
         }
       }
     }
