@@ -1,11 +1,11 @@
 pipeline {
-  agent { label 'macos' }
+  agent { label 'master' }
   options {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   environment {
-    DOCKER_HUB_CREDS = credentials('darinpope-docker-hub')
-    AWS_CREDS = credentials('darinpope-aws-creds')
+    DOCKER_HUB_CREDS = credentials('docker_hub_cred')
+    AWS_CREDS = credentials('nkwochidubem-aws-cred')
     KEYCHAIN_PASSWORD = credentials('darinpope-keychain')
   }
   stages {
@@ -15,11 +15,6 @@ pipeline {
           docker --version
           docker compose version
         '''
-      }
-    }
-    stage('Unlock keychain') {
-      steps {
-        sh 'security -v unlock-keychain -p $KEYCHAIN_PASSWORD ~/Library/Keychains/login.keychain-db'
       }
     }
     stage('Build') {
@@ -35,11 +30,6 @@ pipeline {
         sh 'docker compose up'
         sh 'docker compose ps --format json'
       }
-    }
-  }
-  post {
-    always {
-        sh 'security -v lock-keychain ~/Library/Keychains/login.keychain-db'
     }
   }
 }
