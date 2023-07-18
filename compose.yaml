@@ -1,7 +1,7 @@
-x-aws-vpc: "vpc-0dece3d7dce2d0578"
+x-aws-vpc: "vpc-07612c6b50521af3a"
 services:
   web:
-    image: darinpope/java-web-app:latest
+    image: nkwochidubem/java-web-app:latest
     build:
       context: .
     ports:
