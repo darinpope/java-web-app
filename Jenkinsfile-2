@@ -4,7 +4,7 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   environment {
-    DOCKER_HUB_CREDS = credentials('docker_hub_cred')
+    DOCKER_HUB_CREDS = credentials('docker-hub-password')
     AWS_CREDS = credentials('nkwochidubem-aws-cred')
   }
   stages {
@@ -19,6 +19,7 @@ pipeline {
     stage('Build') {
       steps {
         sh 'docker context use default'
+        sh 'echo $DOCKER_HUB_CREDS | docker login --username=nkwochidubem --password-stdin docker.io'
         sh 'docker compose build'
         sh 'docker compose push'
       }
