@@ -18,6 +18,7 @@ pipeline {
     }
     stage('Build') {
       steps {
+        sh 'docker context ls'
         sh 'docker context use default'
         sh 'echo $DOCKER_HUB_CREDS | docker login --username=nkwochidubem --password-stdin docker.io'
         sh 'docker compose build'
