@@ -27,6 +27,8 @@ pipeline {
     }
     stage('Deploy') {
       steps {
+        sh 'aws ecr get-login-password | docker login -u AWS --password-stdin "https://$(aws sts get-caller-identity --query 'Account' --output text).dkr.ecr.us-east-1.amazonaws.com"'
+        sh 'docker context create ecs myecscontext --from-env'
         sh 'docker context use myecscontext'
         sh 'docker compose up'
         sh 'docker compose ps --format json'
