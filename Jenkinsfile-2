@@ -6,7 +6,6 @@ pipeline {
   environment {
     DOCKER_HUB_CREDS = credentials('docker_hub_cred')
     AWS_CREDS = credentials('nkwochidubem-aws-cred')
-    KEYCHAIN_PASSWORD = credentials('darinpope-keychain')
   }
   stages {
     stage('Tooling versions') {
