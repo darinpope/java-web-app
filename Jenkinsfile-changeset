@@ -11,7 +11,7 @@ pipeline {
         changeset "**/README.md" 
       }
       steps {
-        sh 'README was updated'
+        sh 'echo README was updated'
       }
     }
     stage('final stage') {
