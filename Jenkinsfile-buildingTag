@@ -1,0 +1,23 @@
+pipeline {
+  agent any
+  stages {
+    stage('hello') {
+      steps {
+        sh 'echo hello'
+      }
+    }
+    stage('are we buildingTag?') {
+      when {
+        buildingTag()
+      }
+      steps {
+        sh "we're in buildingTag"
+      }
+    }
+    stage('final') {
+      steps {
+        sh 'echo final stage'
+      }
+    }
+  }
+}
