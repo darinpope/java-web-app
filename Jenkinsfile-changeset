@@ -1,0 +1,23 @@
+pipeline {
+  agent any
+  stages {
+    stage('hello') {
+      steps {
+        sh 'echo hello'
+      }
+    }
+    stage('only for changeset') {
+      when { 
+        changeset "**/README.md" 
+      }
+      steps {
+        sh 'README was updated'
+      }
+    }
+    stage('final stage') {
+      steps {
+        sh 'echo final stage'
+      }
+    }
+  }
+}
