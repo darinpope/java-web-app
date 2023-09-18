@@ -11,7 +11,7 @@ pipeline {
         buildingTag()
       }
       steps {
-        sh "we're in buildingTag"
+        sh "echo we're in buildingTag"
       }
     }
     stage('final') {
