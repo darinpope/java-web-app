@@ -1,0 +1,176 @@
+pipeline {
+    agent any
+
+    environment {
+        data_helper_repo_url = 'https://github.com/maramvenkatareddy/node_js.git'
+        platform_app_url = 'https://github.com/maramvenkatareddy/java-web-app.git'
+        k8s_manifest_url = 'https://github.com/maramvenkatareddy/sample-project.git'
+        branch = 'main'
+        commitHash = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+    }
+
+    tools {
+        jdk 'java-11'
+    }
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('java') {
+            steps {
+                sh 'java -version'
+            }
+        }
+
+        stage('Read Config YAML') {
+            steps {
+                script {
+                    try {
+                        property = readYaml file: "config.yaml"
+                        if (env.ENVIRONMENT == "qa") {
+                            config = property.qa
+                            echo "Config: ${config}"
+                        } else if (env.ENVIRONMENT == "prod") {
+                            config = property.prod
+                            echo "Config: ${config}"
+                        } else {
+                            error "ENVIRONMENT variable not set or invalid!"
+                        }
+                    } catch (Exception e) {
+                        error "Failed at reading config file. Error: ${e}"
+                    }
+                }
+            }
+        }
+
+        stage('Clone Platform Application Repository') {
+            steps {
+                dir('repo2') {
+                    git branch: "${branch}", url: "${platform_app_url}"
+                }
+            }
+        }
+        stage('clone the manifest files') {
+            steps {
+                dir('k8s') {
+                    git branch: "${branch}", url: "${k8s_manifest_url}", credentialsId: 'ggit'
+                }
+            }
+        }
+
+        stage('Clone Data Helper Repository') {
+            steps {
+                dir('repo1') {
+                    git branch: "${branch}", url: "${data_helper_repo_url}"
+                }
+            }
+        }
+
+        stage('Build Dependency') {
+            steps {
+                dir('repo1') {
+                    sh "npm install"
+                }
+            }
+        }
+
+        stage('Build Application') {
+            steps {
+                dir('repo2') {
+                    sh "mvn clean install"
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir("${config.path}") {
+                    script {
+                        if (env.ENVIRONMENT == "qa") {
+                            sh "docker build -t ${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash} -f Dockerfile.qa ."
+                        } else if (env.ENVIRONMENT == "prod") {
+                            sh "docker build -t ${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash} -f Dockerfile.prod ."
+                        }
+                        sh "docker tag ${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash} ${config.ecr_url}/${config.repo_name}:latest"
+                        sh "ls"
+                        sh "cat Dockerfile.qa"
+                        sh "pwd"
+                    }
+                }
+            }
+        }
+
+        stage('Docker Image Push to ECR Repo') {
+            steps {
+                dir("${config.path}") {
+                    script {
+                        sh "aws ecr get-login-password --region ${config.region} | docker login --username AWS --password-stdin ${config.ecr_url}"
+                        def commitHash = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+                        sh "docker push ${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash}"
+                        sh "docker push ${config.ecr_url}/${config.repo_name}:latest"
+                    }
+                }
+            }
+        }
+        stage('Update Image Tag in Deployment File') {
+            environment {
+                deploymentFile = "${config.deploymentfile}"
+            }
+            steps {
+                dir('k8s') {
+                    script {
+                        // Set Git configuration
+                        sh 'git config user.email "venkat@gmail.com"'
+                        sh 'git config user.name "venkat"'
+                        sh 'echo "${deploymentFile}"'
+                        // Ensure the deployment file exists
+                        if (fileExists(deploymentFile)) {
+                            echo "Updating image tag in ${deploymentFile}"
+        
+                            // Replace 'tag' placeholder with the desired image version (e.g., 1.23)
+                
+                            // Uncomment the following if the placeholder replacement is different
+                             sh "sed -i 's|image: [^ ]*|image: ${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash}|' ${deploymentFile}"
+        
+                            // Git commit and push using the credentials
+                            sh 'git add ${deploymentFile}'
+                            sh 'git commit -m "Updated to the newer version [ci skip]"'
+                            // Use the credentials for Git push
+                            withCredentials([usernamePassword(credentialsId: 'ggit', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                                echo "username is $USERNAME"
+                                echo "password is $PASSWORD"
+                                sh "git push https://${USERNAME}:${PASSWORD}@github.com/${USERNAME}/sample-project.git"
+                            }
+        
+                            // Print the contents of the deployment file for verification
+                            sh "cat ${deploymentFile}"
+                        } else {
+                            error "Deployment file ${deploymentFile} not found!"
+                        }
+                    }
+                }
+        }
+    }
+}
+
+post {
+    always {
+        slackSend(
+            channel: 'jenkins',
+            message: """
+                *Pipeline Status:*    ${currentBuild.currentResult}
+                *Job Name:*           ${env.JOB_NAME}
+                *Build Number:*       #${env.BUILD_NUMBER}
+                *Build URL:*          ${env.BUILD_URL}
+                *Duration:*           ${currentBuild.durationString}
+                *Branch:*             ${env.GIT_BRANCH ?: 'N/A'}
+            """.stripIndent()
+        )
+    }
+}
+
+
+}

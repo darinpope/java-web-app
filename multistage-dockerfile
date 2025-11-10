@@ -1,0 +1,15 @@
+# build the application => stage-1
+
+FROM maven:3.8.5-openjdk-17 As build
+WORKDIR /app 
+ADD . .
+RUN mvn package
+
+# run the application => stage-2
+
+FROM openjdk:17-alpine3.14
+WORKDIR /app
+COPY --from=build /target/*.jar .
+ENTRYPOINT ["java", "-jar"]
+EXPOSE 8080
+CMD [/*.jar]

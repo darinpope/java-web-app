@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-deployment
+  labels:
+    app: arivihan
+spec:
+  replicas: 1  # Adjust the number of replicas as needed
+  selector:
+    matchLabels:
+      app: platform
+  template:
+    metadata:
+      labels:
+        app: platform
+    spec:
+      containers:
+      - name: platform
+        image: 619071347058.dkr.ecr.us-west-2.amazonaws.com/prod-video:1.0
+        ports:
+        - containerPort: 8080

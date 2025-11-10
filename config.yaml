@@ -1,0 +1,13 @@
+qa:
+  path: "repo2"
+  environment: "qa"
+  repo_name: "video"
+  region: "us-west-2"
+  ecr_url: "619071347058.dkr.ecr.us-west-2.amazonaws.com"
+  deploymentfile: "eks/prod/deployment.yaml"
+prod:
+  path: "repo2"
+  environment: "prod"
+  repo_name: "prod-video"
+  region: "us-west-2"
+  ecr_url: "619071347058.dkr.ecr.us-west-2.amazonaws.com"

@@ -1,0 +1,155 @@
+def notifySlack(String buildStatus = 'SUCCESS') {
+    def colorMap = [
+        'SUCCESS': 'good',
+        'FAILURE': 'danger',
+        'UNSTABLE': 'warning',
+        'ABORTED': '#808080'
+    ]
+    
+    def message = """
+        *Build Status*: ${buildStatus}
+        *Job*: ${env.JOB_NAME}
+        *Build Number*: #${env.BUILD_NUMBER}
+        //*Branch*: ${gitbranch}
+        *Duration*: ${currentBuild.durationString}
+        *Build URL*: ${env.BUILD_URL}
+        *Environment*: ${ENVIRONMENT}
+    """.stripIndent()
+    
+    slackSend(
+        channel: config.SLACK_CHANNEL,
+        color: colorMap[buildStatus],
+        message: message
+    )
+}
+node('master') {
+    checkout scm
+    def data_helper_repo_url = 'https://github.com/maramvenkatareddy/node_js.git'
+    def platform_app_url = 'https://github.com/maramvenkatareddy/java-web-app.git'
+   // def gitbranch = 'main'
+    def GITHUB_TOKEN = credentials('ggit')
+     properties([
+        pipelineTriggers([
+            // Poll SCM for changes in the specific repository
+            pollSCM("* * * * *") // This is the cron schedule format
+        ])
+    ])
+
+    try {
+        // Read the config file and set the environment
+        property = readYaml file: "config.yaml"
+        if (ENVIRONMENT == "qa") {
+            config = property.qa
+            echo "Config: ${config}"
+        } else if (ENVIRONMENT == "prod") {
+            config = property.prod
+            echo "Config: ${config}"
+        } else {
+            error "ENVIRONMENT variable not set or invalid!"
+        }
+    } catch (Exception e) {
+        error "Failed at reading config file. Error: ${e}"
+    }
+
+    try {
+        def commitHash = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
+        // Debugging: echo the repository URLs
+        echo "Data Helper Repo URL: ${data_helper_repo_url}"
+        echo "Platform App Repo URL: ${platform_app_url}"
+        echo "commit_hash: ${commitHash}"
+        sh "printenv"
+
+        // Clone Datahelper Repository
+        stage('Clone Platform Application Repository') {
+            dir('repo2') {
+                echo "Cloning repository: ${platform_app_url}"
+                git branch: 'main', url: "${platform_app_url}"
+                echo "Checked out Platform Application Repository"
+                sh "ls"
+               // sh "git branch"
+            }
+        }
+        stage('Clone Datahelper Repository') {
+            dir('repo1') {
+                echo "Cloning repository: ${data_helper_repo_url}"
+                echo "commit_hash: ${commitHash}"
+                git branch: 'main', url: "${data_helper_repo_url}"
+                echo "Checked out Datahelper Repository"
+                sh "ls"
+                sh "git branch"
+            }
+        }
+        stage('build the dependency') {
+            dir('repo1') {
+                sh "npm install"
+            }
+        }
+    
+        stage('buidl') {
+            dir('repo2') {
+                sh "mvn clean install"
+            }
+        }
+        stage('Docker build') {
+          dir("${config.path}") {
+            current = "Stage Docker build"
+             if (ENVIRONMENT == "qa") {
+                sh "docker build -t ${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash} -f Dockerfile.qa ."
+             } else if (ENVIRONMENT == "prod") { 
+                sh "docker build -t ${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash}  -f Dockerfile.prod ."
+             }
+            sh "docker tag ${config.ecr_url}/${config.repo_name}:main-1 ${config.ecr_url}/${config.repo_name}:latest"
+          }
+        }
+  
+        stage('Docker Image Push to ECR Repo') {
+            dir("${config.path}") {
+              stage('Docker Image Push to Ecr') {
+                current = "Stage Docker Image Push to Ecr"
+                sh "aws ecr get-login-password --region ${config.region} | docker login --username AWS --password-stdin ${config.ecr_url}"
+                sh "docker push ${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash}"
+                sh "docker push ${config.ecr_url}/${config.repo_name}:latest"
+            }
+          }
+        }
+        stage('Update Image Tag in Deployment File') {
+            dir('repo2') {
+                    // Set Git configuration
+                sh 'git config user.email "venkat@gmail.com"'
+                sh 'git config user.name "venkat"'
+    
+                // Define the deployment file path
+                def deploymentFile = 'eks/prod/deployment.yaml'
+    
+                // Ensure the deployment file exists
+                if (fileExists(deploymentFile)) {
+                    echo "Updating image tag in ${deploymentFile}"
+    
+                    // Replace 'tag' placeholder with the desired image version (e.g., 1.23)
+                    sh "sed -i 's|image: 619071347058.dkr.ecr.us-west-2.amazonaws.com|image: 619071347058.dkr.ecr.us-west-2.amazonaws.com/prod-video:${config.environment}-${commitHash}|g' ${deploymentFile}"
+                    // sh "sed -i 's|image: [^ ]*|image: \"${config.ecr_url}/${config.repo_name}:${config.environment}-${commitHash}\"|g' ${deploymentFile}"
+    
+                    // Git commit and push using the credentials
+                    sh 'git add .'
+                    sh 'git commit -m "Updated to the newer version [ci skip]"'
+                    // Use the credentials for Git push
+                    withCredentials([usernamePassword(credentialsId: 'ggit', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                      echo "username is $USERNAME"
+                      echo "password is $PASSWORD"
+                      sh 'git push https://${USERNAME}:${PASSWORD}@github.com/${USERNAME}/java-web-app.git'
+                }
+                    sh "cat ${deploymentFile}"
+                } else {
+                    error "Deployment file ${deploymentFile} not found!"
+                }
+            }
+        }
+
+        notifySlack('SUCCESS')
+
+    } catch (Exception e) {
+        error "Pipeline failed with error: ${e}"
+        notifySlack('FAILURE')
+        error "Your continuous build failed at ${current}: ${e.getMessage()}"
+    }
+}

@@ -1,0 +1,88 @@
+node('master') {
+    checkout scm
+    def data_helper_repo_url = 'https://github.com/maramvenkatareddy/node_js.git'
+    def platform_app_url = 'https://github.com/maramvenkatareddy/java-web-app.git'
+    def gitbranch = 'sample-test'
+    def GITHUB_TOKEN = credentials('ggit')
+    
+    // Fixed properties block with correct SCM polling syntax
+    properties([
+        pipelineTriggers([
+            [$class: 'SCMTrigger', 
+             scmpoll_spec: '* * * * *',
+             ignorePostCommitHooks: false]
+        ])
+    ])
+
+    try {
+        // Read the config file and set the environment
+        property = readYaml file: "config.yaml"
+        if (ENVIRONMENT == "qa") {
+            config = property.qa
+            echo "Config: ${config}"
+        } else if (ENVIRONMENT == "prod") {
+            config = property.prod
+            echo "Config: ${config}"
+        } else {
+            error "ENVIRONMENT variable not set or invalid!"
+        }
+    } catch (Exception e) {
+        error "Failed at reading config file. Error: ${e}"
+    }
+
+    try {
+        // First checkout platform app
+        stage('Clone Platform Application Repository') {
+            dir('repo2') {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/${gitbranch}"]],
+                    userRemoteConfigs: [[
+                        url: platform_app_url,
+                        credentialsId: 'ggit'
+                    ]]
+                ])
+                echo "Checked out Platform Application Repository"
+                sh "ls"
+                sh "git branch"
+            }
+        }
+        
+        def commitHash = sh(
+            script: "cd repo2 && git rev-parse HEAD", 
+            returnStdout: true
+        ).trim()
+        
+        echo "Data Helper Repo URL: ${data_helper_repo_url}"
+        echo "Platform App Repo URL: ${platform_app_url}"
+        echo "commit_hash: ${commitHash}"
+        sh "printenv"
+
+        stage('Clone Datahelper Repository') {
+            dir('repo1') {
+                git branch: "${gitbranch}", 
+                    url: "${data_helper_repo_url}",
+                    credentialsId: 'ggit'
+                echo "Checked out Datahelper Repository"
+                sh "ls"
+                sh "git branch"
+            }
+        }
+
+        // Rest of your stages remain the same...
+        stage('build the dependency') {
+            dir('repo1') {
+                sh "npm install"
+            }
+        }
+    
+        stage('buidl') {
+            dir('repo2') {
+                sh "mvn clean install"
+            }
+        }
+        
+    } catch (Exception e) {
+        error "Pipeline failed: ${e.getMessage()}"
+    }
+}
